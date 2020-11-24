@@ -1,5 +1,5 @@
 <hr>
- <h3 align="center">Burp to Slack</h3>
+ <h1 align="center">Burp to Slack</h1>
  
  <p align="center">
 <img src="pic.PNG"  />
