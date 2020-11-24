@@ -19,3 +19,8 @@
      - [ ] Match more options 
 
 
+#### Bugs / Feedback / PRs
+Any comment, issue or pull request will be highly appreciated :)
+
+#### Author
+b1twis3 - https://twitter.com/fasthm00
