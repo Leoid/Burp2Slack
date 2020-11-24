@@ -4,9 +4,7 @@
  <p align="center">
 <img src="pic.PNG"  />
 </p>
-<p align="center">
-<img src="sc1.png"  />
-</p>
+
 
 ### Main Features
 * Poll Notifications every X seconds.
