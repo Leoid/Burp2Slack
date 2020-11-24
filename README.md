@@ -1,10 +1,12 @@
 <hr>
- <h3 align="center">Push notifications to Slack channel or to custom server based on BurpSuite response conditions.</h3>
+ <h3 align="center">Burp to Slack</h3>
  
  <p align="center">
 <img src="pic.PNG"  />
 </p>
 
+<hr>
+Push notifications to Slack channel or to custom server based on BurpSuite response conditions.
 
 ### Main Features
 * Poll Notifications every X seconds.
