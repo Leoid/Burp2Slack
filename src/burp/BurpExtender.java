@@ -1,7 +1,11 @@
 package burp;
 
+import com.slack.api.Slack;
+import com.slack.api.webhook.Payload;
+import com.slack.api.webhook.WebhookResponse;
+
 import java.awt.*;
-import java.net.URL;
+import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
@@ -73,34 +77,20 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
 
             // Make the Request
-            URL url = null;
-            try {
-                url = new URL(this.hostname);
-            } catch (Exception e) {
-                this.callbacks.printOutput("error: " + e);
-            }
-            String PostPath = url.getPath();
-
             this.hostname = BurpExtenderTab.configcomp.slackURLtxtbox.getText().toString();
 
 
+            Slack slack = Slack.getInstance();
+            String webhookUrl = this.hostname;
+            Payload payload = Payload.builder().text(getCurrentPayload).build();
 
-            String requestPOSTTemplate = "POST " + PostPath + " HTTP/1.1\r\n" +
-                    "Host: hooks.slack.com\r\n" +
-                    "Connection: close\r\n" +
-                    "Accept: */*\r\n" +
-                    "Content-type: application/json\r\n" +
-                    "User-Agent: Intruder2Slack/1.0\r\n" +
-                    "Content-Length: " + getCurrentPayload.length() + "\r\n\r\n" +
-                    getCurrentPayload;
+            try {
+                WebhookResponse response = slack.send(webhookUrl, payload);
 
 
-            String request = requestPOSTTemplate;
-
-
-            byte[] requestBytes = callbacks.getHelpers().stringToBytes(request);
-            byte[] responseBytes = callbacks.makeHttpRequest("hooks.slack.com", 443, true, requestBytes);
-
+            } catch (IOException e) {
+                this.callbacks.printOutput("webhook error: "+e);
+            }
 
         }
     }
@@ -114,12 +104,12 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         int getPollSeconds = Integer.parseInt(BurpExtenderTab.configcomp.pollseconds.getText().toString());
 
         if (VariableManager.getisStart()) {
-            this.callbacks.printOutput("possls "+getPollSeconds);
             timer = new Timer("Timer");
             TimerTask task = new TimerTask() {
                 public void run() {
 
                     Match2Slack();
+
                 }
             };
 
@@ -150,17 +140,40 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
                     String responseBody = callbacks.getHelpers().bytesToString(byte_body);
                     responseBody = this.callbacks.getHelpers().urlEncode(responseBody).toString();
-                    String getBody = responseBody.replace("\"", "\\\"");
 
+
+                    // Get response body textbox Index
+                    int checkbody = responseBody.indexOf(BurpExtenderTab.configcomp.responsebodycontainstxtbox.getText().toString());
+                    String responseBodyInput = BurpExtenderTab.configcomp.responsebodycontainstxtbox.getText().toString().replace("\"", "\\\"");
+
+                    // Replace {{BODY}} with the following string. 100 chars before and after (to just focus on the matched payload).
+                    String getBody = "";
+                    int margin = 100;
+                    if (checkbody != -1 ) {
+                        if (checkbody > margin) {
+                            if (checkbody + margin > responseBody.length()) {
+                                getBody = responseBody.substring(checkbody - margin, responseBody.length());
+                            } else {
+                                getBody = responseBody.substring(checkbody - margin, checkbody + margin);
+                            }
+                        } else {
+                            if(checkbody - margin < 0 && responseBody.length() > margin){
+                            getBody = responseBody.substring(0, checkbody + margin);
+                            }else{
+                                getBody = responseBody.substring(0, responseBody.length());
+                            }
+                        }
+
+                    }
+
+                    int responseContentLength = responseBody.length();
 
                         // Checking IF {body contains}
                         if (BurpExtenderTab.configcomp.responsebodycontainstxtbox.getText().toString().length() > 0) {
-                            if (responseBody.contains(BurpExtenderTab.configcomp.responsebodycontainstxtbox.getText().toString())
-
-                            ) {
-                                this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
-                                        BurpExtenderTab.configcomp.responsebodycontainstxtbox.getText().toString().replace("\"", "\\\""));
+                            if (checkbody!=-1) {
+                                this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",responseBodyInput);
                                 this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
+
                                 pushMessage();
 
                             }
@@ -174,6 +187,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                 this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                         " " + responseStatusCode);
                                 this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
+
                                 pushMessage();
 
                             }
@@ -188,7 +202,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
                                     this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                             responseHeaders.get(ii).toString().replace("\"", "\\\""));
-                                    this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
+                                    this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", responseHeaders.get(ii).toString().replace("\"", "\\\""));
                                     pushMessage();
                                     ii = responseHeaders.size();
 
@@ -198,10 +212,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                             }
                         }
 
-
                         // Check Response Length
-                        int responseContentLength = responseBody.length();
-
                         if (BurpExtenderTab.configcomp.contentlengthtxtbox.getText().toString().length() > 0) {
                             String contentlength = BurpExtenderTab.configcomp.contentlengthtxtbox.getText().toString();
                             char operator = contentlength.charAt(0);
