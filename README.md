@@ -3,7 +3,7 @@
  
  <p align="center">
 <img src="pic.PNG"  />
-<img src="Slack.PNG"  />
+<img src="Slack.png"  />
 </p>
 
 <hr>
