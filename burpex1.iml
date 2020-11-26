@@ -4,14 +4,11 @@
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="jdk" jdkName="corretto-11" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="burpapi" exported="" />
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
@@ -21,5 +18,12 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Maven: net.portswigger.burp.extender:burp-extender-api:2.1" level="project" />
+    <orderEntry type="library" name="Maven: com.intellij:forms_rt:6.0.5" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-commons:2.2.3" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-tree:2.2.3" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm:2.2.3" level="project" />
+    <orderEntry type="library" name="Maven: com.jgoodies:forms:1.0.7" level="project" />
+    <orderEntry type="library" name="Maven: jdom:jdom:1.0" level="project" />
   </component>
 </module>
