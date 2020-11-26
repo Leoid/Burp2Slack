@@ -83,6 +83,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
             this.hostname = BurpExtenderTab.configcomp.slackURLtxtbox.getText().toString();
 
+
+
             String requestPOSTTemplate = "POST " + PostPath + " HTTP/1.1\r\n" +
                     "Host: hooks.slack.com\r\n" +
                     "Connection: close\r\n" +
@@ -91,6 +93,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                     "User-Agent: Intruder2Slack/1.0\r\n" +
                     "Content-Length: " + getCurrentPayload.length() + "\r\n\r\n" +
                     getCurrentPayload;
+
 
             String request = requestPOSTTemplate;
 
@@ -109,7 +112,9 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         this.callbacks.saveBuffersToTempFiles(messageInfo);
         log.add(new LogRequestResponse(toolFlag, callbacks.saveBuffersToTempFiles(messageInfo), messageIsRequest));
         int getPollSeconds = Integer.parseInt(BurpExtenderTab.configcomp.pollseconds.getText().toString());
+
         if (VariableManager.getisStart()) {
+            this.callbacks.printOutput("possls "+getPollSeconds);
             timer = new Timer("Timer");
             TimerTask task = new TimerTask() {
                 public void run() {
@@ -144,6 +149,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                     byte[] byte_body = Arrays.copyOfRange(byte_Request, bodyOffset, byte_Request.length);
 
                     String responseBody = callbacks.getHelpers().bytesToString(byte_body);
+                    responseBody = this.callbacks.getHelpers().urlEncode(responseBody).toString();
+                    String getBody = responseBody.replace("\"", "\\\"");
 
 
                         // Checking IF {body contains}
@@ -152,8 +159,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
                             ) {
                                 this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
-                                        BurpExtenderTab.configcomp.responsebodycontainstxtbox.getText().toString());
-                                this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", responseBody);
+                                        BurpExtenderTab.configcomp.responsebodycontainstxtbox.getText().toString().replace("\"", "\\\""));
+                                this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
                                 pushMessage();
 
                             }
@@ -166,7 +173,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                             ) {
                                 this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                         " " + responseStatusCode);
-                                this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", responseBody);
+                                this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
                                 pushMessage();
 
                             }
@@ -180,8 +187,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                 ) {
 
                                     this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
-                                            responseHeaders.get(ii).toString());
-                                    this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", responseBody);
+                                            responseHeaders.get(ii).toString().replace("\"", "\\\""));
+                                    this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
                                     pushMessage();
                                     ii = responseHeaders.size();
 
@@ -205,7 +212,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                     if (responseContentLength > targetlength) {
                                         this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                                 " > " + targetlength);
-                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", responseBody);
+                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
                                         pushMessage();
                                     }
                                     break;
@@ -214,7 +221,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                     if (responseContentLength < targetlength) {
                                         this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                                 " < " + targetlength);
-                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", responseBody);
+                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
                                         pushMessage();
                                     }
                                     break;
@@ -223,7 +230,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                     if (responseContentLength == targetlength) {
                                         this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                                 " == " + targetlength);
-                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", responseBody);
+                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
                                         pushMessage();
                                     }
                                     break;
@@ -232,7 +239,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                     if (responseContentLength != targetlength) {
                                         this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                                 " != " + targetlength);
-                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", responseBody);
+                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
                                         pushMessage();
                                     }
                                     break;
