@@ -258,8 +258,5 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         }
 
 
-//        if(!messageIsRequest && toolFlag == IBurpExtenderCallbacks.TOOL_INTRUDER){
-//
-//        }
     }
 }

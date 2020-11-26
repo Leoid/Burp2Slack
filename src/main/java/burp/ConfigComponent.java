@@ -29,7 +29,7 @@ public class ConfigComponent {
 
     public static String checktest = "hello";
     public IBurpExtenderCallbacks callbacks;
-//    public static boolean isStart = false;
+
 
     public ConfigComponent(IBurpExtenderCallbacks callbacks) {
         this.callbacks = callbacks;
