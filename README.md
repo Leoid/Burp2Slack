@@ -24,6 +24,10 @@ When one of the above conditions met, then it pushes a notification to either a 
 * Support both Slack webhook and custom HTTP listeners.
 * Match Burp proxy, Repeater, Intruder and Scanner/Spider.
 
+#### Build the Project
+Use the following command to build the Jar file.
+> mvn clean install
+
 #### TODO:
      - [ ] BurpCollaborator to Slack
      - [ ] Match more options 
